@@ -666,7 +666,7 @@ function viewProduct(id) {
   document.getElementById('details-section').style.display = 'block';
 
   // store current product
-  document.getElementById('details-section').dataset.pid = id;
+document.getElementById('details-section').dataset.pid = id;
   selectDelivery('office');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -708,11 +708,13 @@ async function sendOrder() {
 
   if (!name)    { toast('أدخل اسمك الكامل', 'warn'); return; }
   if (!phone)   { toast('أدخل رقم هاتفك', 'warn');   return; }
-  if (wilaya === 'اختر الولاية') { toast('اختر الولاية', 'warn'); return; }
+  if (wilaya === 'اختر الولاية' || !wilaya) { toast('اختر الولاية', 'warn'); return; }
   if (!commune) { toast('أدخل اسم بلديتك', 'warn');  return; }
 
   const pid = parseInt(document.getElementById('details-section').dataset.pid);
   const p   = products.find(x => x.id === pid);
+  if (!p) return;
+
   const productPrice = parseInt(p.price.replace(/\D/g, ''));
   const deliveryFee  = DELIVERY_FEES[deliveryType];
   const total        = productPrice + deliveryFee;
@@ -720,8 +722,10 @@ async function sendOrder() {
 
   // Disable button + show loading
   const btn = document.querySelector('.btn-order');
-  btn.disabled = true;
-  btn.querySelector('span').textContent = '⏳  جاري الإرسال...';
+  if(btn) {
+    btn.disabled = true;
+    if(btn.querySelector('span')) btn.querySelector('span').textContent = '⏳  جاري الإرسال...';
+  }
 
   const payload = {
     name,
@@ -737,11 +741,15 @@ async function sendOrder() {
   };
 
   try {
+    // التعديل هنا: نغلف البيانات بـ action لتتوافق مع الـ Apps Script الجديد
     await fetch(SHEET_URL, {
       method:  'POST',
       mode:    'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload),
+      body:    JSON.stringify({
+        action: "addOrder",
+        order: payload
+      }),
     });
 
     // Success
@@ -757,26 +765,35 @@ async function sendOrder() {
     selectDelivery('office');
 
   } catch (err) {
+    console.error(err);
     toast('حدث خطأ، حاول مجدداً', 'warn');
   } finally {
-    btn.disabled = false;
-    btn.querySelector('span').textContent = 'تأكيد الطلب ←';
+    if(btn) {
+      btn.disabled = false;
+      if(btn.querySelector('span')) btn.querySelector('span').textContent = 'تأكيد الطلب ←';
+    }
   }
 }
 
 // ── CART ─────────────────────────────────────────────
 function updateCart() {
   const count = cart.reduce((s,x)=>s+x.qty,0);
-  document.getElementById('cartN').textContent = count;
+  const cartN = document.getElementById('cartN');
+  if(cartN) cartN.textContent = count;
+  
   const body  = document.getElementById('cdBody');
   const foot  = document.getElementById('cdFoot');
   const empty = document.getElementById('cdEmpty');
+  if(!body) return;
+
   if (!cart.length) {
-    body.innerHTML = ''; body.appendChild(empty);
-    empty.style.display='flex'; foot.style.display='none';
+    body.innerHTML = ''; 
+    if(empty) { body.appendChild(empty); empty.style.display='flex'; }
+    if(foot) foot.style.display='none';
   } else {
-    empty.style.display='none'; foot.style.display='block';
-    const total = cart.reduce((s,x)=>s+parseInt(x.price)*x.qty,0);
+    if(empty) empty.style.display='none'; 
+    if(foot) foot.style.display='block';
+    const total = cart.reduce((s,x)=>s+(parseInt(x.price.replace(/\D/g,''))||0)*x.qty,0);
     body.innerHTML = cart.map(item=>`
       <div class="cd-item">
         <div class="cd-thumb"><img src="${item.img}" alt="${item.name}"></div>
@@ -789,7 +806,8 @@ function updateCart() {
         </button>
       </div>
     `).join('');
-    document.getElementById('cdTotal').textContent = total + ' DA';
+    const cdTotal = document.getElementById('cdTotal');
+    if(cdTotal) cdTotal.textContent = total.toLocaleString('ar') + ' DA';
   }
 }
 function removeFromCart(id) { cart=cart.filter(x=>x.id!==id); updateCart(); }
@@ -806,6 +824,7 @@ const icons = {
 };
 function toast(msg, type='check') {
   const stack = document.getElementById('toasts');
+  if(!stack) return;
   const el = document.createElement('div');
   el.className = 'toast';
   el.innerHTML = `${icons[type]||icons.check}<span>${msg}</span>`;
@@ -816,26 +835,33 @@ function toast(msg, type='check') {
 
 // ── CURSOR ────────────────────────────────────────────
 const cur=document.getElementById('cur'), cur2=document.getElementById('cur2');
-document.addEventListener('mousemove', e => {
-  cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px';
-  setTimeout(()=>{ cur2.style.left=e.clientX+'px'; cur2.style.top=e.clientY+'px'; }, 50);
-});
+if(cur && cur2){
+  document.addEventListener('mousemove', e => {
+    cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px';
+    setTimeout(()=>{ cur2.style.left=e.clientX+'px'; cur2.style.top=e.clientY+'px'; }, 50);
+  });
+}
 
 // ── HEADER ON SCROLL ──────────────────────────────────
 window.addEventListener('scroll', () => {
-  if (document.getElementById('hero').style.display === 'none') {
-    document.getElementById('hdr').classList.add('visible');
+  const hero = document.getElementById('hero');
+  if (hero && hero.style.display === 'none') {
+    const hdr = document.getElementById('hdr');
+    if(hdr) hdr.classList.add('visible');
   }
 });
 
 // ── INIT ─────────────────────────────────────────────
-renderProducts();
+if(typeof renderProducts === 'function') {
+  renderProducts();
+}
 
 // Loader
 window.addEventListener('load', () => {
   const bar = document.getElementById('lbar');
-  bar.classList.add('go');
-  setTimeout(() => document.getElementById('loader').classList.add('done'), 1100);
+  const loader = document.getElementById('loader');
+  if(bar) bar.classList.add('go');
+  if(loader) setTimeout(() => loader.classList.add('done'), 1100);
 });
 </script>
 </body>
