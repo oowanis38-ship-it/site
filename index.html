@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TNG STORE | OFFICIAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,700;1,700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ══ RESET & BASE ══ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#080808;--white:#f4f2ee;--accent:#ffffff;--dim:#1a1a1a;
+  --border:rgba(244,242,238,.08);--muted:rgba(244,242,238,.4);
+  --red:#c0392b;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Tajawal',sans-serif;background:var(--black);color:var(--white);overflow-x:hidden;cursor:none}
+
+/* ══ CURSOR ══ */
+#cur{position:fixed;width:10px;height:10px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s}
+#cur2{position:fixed;width:40px;height:40px;border:1px solid rgba(255,255,255,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .3s}
+body:has(a:hover) #cur,body:has(button:hover) #cur{width:6px;height:6px}
+body:has(a:hover) #cur2,body:has(button:hover) #cur2{width:56px;height:56px;border-color:var(--accent)}
+
+/* ══ SCROLLBAR ══ */
+::-webkit-scrollbar{width:2px}
+::-webkit-scrollbar-thumb{background:var(--accent)}
+
+/* ══ NOISE ══ */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+  background-size:200px;opacity:.5}
+
+/* ══ KEYFRAMES ══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes heroSlide{from{transform:translateY(0)}to{transform:translateY(-100%)}}
+@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes glitch1{0%,100%{clip-path:inset(0 0 95% 0)}20%{clip-path:inset(30% 0 50% 0)}40%{clip-path:inset(80% 0 5% 0)}60%{clip-path:inset(10% 0 70% 0)}80%{clip-path:inset(55% 0 30% 0)}}
+@keyframes glitch2{0%,100%{clip-path:inset(50% 0 30% 0);transform:translateX(-3px)}33%{clip-path:inset(10% 0 80% 0);transform:translateX(3px)}66%{clip-path:inset(70% 0 10% 0);transform:translateX(-2px)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+
+/* ══ LOADER ══ */
+#loader{position:fixed;inset:0;background:var(--black);z-index:8000;display:flex;align-items:center;justify-content:center;transition:opacity .5s 1s,visibility .5s 1s}
+#loader.done{opacity:0;visibility:hidden}
+.loader-inner{text-align:center}
+.loader-logo{font-family:'Bebas Neue';font-size:80px;letter-spacing:12px;color:var(--white);position:relative;line-height:1}
+.loader-logo::before,.loader-logo::after{content:'TNG STORE';position:absolute;left:0;top:0;width:100%;color:var(--accent)}
+.loader-logo::before{animation:glitch1 .6s infinite;opacity:.7}
+.loader-logo::after{animation:glitch2 .8s infinite;opacity:.5;color:#fff}
+.loader-bar{width:120px;height:1px;background:rgba(255,255,255,.1);margin:24px auto 0;position:relative;overflow:hidden}
+.loader-bar::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--accent);animation:none}
+.loader-bar.go::after{animation:loadFill .7s ease forwards}
+@keyframes loadFill{to{left:0}}
+
+/* ══ HERO ══ */
+#hero{
+  position:fixed;inset:0;z-index:5000;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:url('https://i.postimg.cc/65tGNM5T/IMG-20260520-193949-188.jpg') center/cover no-repeat;
+  transition:transform 8s cubic-bezier(.1,0,.2,1);
+}
+#hero:hover .hero-bg{transform:scale(1.04)}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,1) 0%,rgba(8,8,8,.5) 40%,rgba(8,8,8,.1) 100%)}
+.hero-scanline{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(transparent,rgba(232,213,163,.15),transparent);animation:scanline 4s linear infinite;pointer-events:none}
+
+.hero-content{position:relative;z-index:2;padding:60px}
+.hero-tag{display:inline-block;border:1px solid rgba(232,213,163,.3);color:var(--accent);font-size:10px;letter-spacing:5px;padding:6px 16px;margin-bottom:24px;text-transform:uppercase}
+.hero-title{
+  font-family:'Bebas Neue';font-size:clamp(80px,14vw,200px);
+  line-height:.9;color:var(--white);letter-spacing:4px;
+  position:relative;
+}
+.hero-title .outline{-webkit-text-stroke:1px rgba(244,242,238,.3);color:transparent}
+.hero-sub{font-size:11px;letter-spacing:6px;color:var(--muted);text-transform:uppercase;margin:20px 0 40px}
+.hero-actions{display:flex;gap:16px;align-items:center}
+.btn-enter{
+  display:inline-flex;align-items:center;gap:12px;
+  padding:16px 48px;background:var(--white);color:var(--black);
+  border:none;cursor:pointer;
+  font-family:'Bebas Neue';font-size:18px;letter-spacing:4px;
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.btn-enter::before{content:'';position:absolute;inset:0;background:var(--accent);transform:translateX(101%);transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.btn-enter:hover::before{transform:translateX(0)}
+.btn-enter span{position:relative;z-index:1}
+.btn-enter svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;position:relative;z-index:1;transition:transform .3s}
+.btn-enter:hover svg{transform:translateX(-6px)}
+.hero-scroll-hint{color:var(--muted);font-size:10px;letter-spacing:4px}
+
+/* ══ HEADER ══ */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:3000;
+  padding:0 48px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(8,8,8,.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  transform:translateY(-100%);transition:transform .6s cubic-bezier(.4,0,.2,1);
+}
+header.visible{transform:translateY(0)}
+.logo{font-family:'Bebas Neue';font-size:26px;letter-spacing:6px;color:var(--white);text-decoration:none}
+.logo em{color:var(--accent);font-style:normal}
+.header-nav{display:flex;gap:32px}
+.header-nav a{font-size:11px;letter-spacing:3px;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color .3s;position:relative;padding-bottom:2px}
+.header-nav a::after{content:'';position:absolute;bottom:0;right:0;width:0;height:1px;background:var(--accent);transition:width .3s}
+.header-nav a:hover{color:var(--white)}
+.header-nav a:hover::after{width:100%;left:0}
+.h-right{display:flex;gap:8px}
+.h-btn{width:40px;height:40px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:all .3s}
+.h-btn:hover{border-color:var(--accent);color:var(--accent)}
+.h-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.cart-n{position:absolute;top:-5px;right:-5px;width:17px;height:17px;border-radius:50%;background:var(--accent);color:var(--black);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Tajawal';border:2px solid var(--black)}
+
+/* ══ MARQUEE ══ */
+.marquee{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--dim);padding:12px 0}
+.mq-track{display:flex;white-space:nowrap;animation:marq 20s linear infinite}
+.mq-item{display:inline-flex;align-items:center;gap:20px;padding:0 32px;font-family:'Bebas Neue';font-size:14px;letter-spacing:3px;color:var(--muted)}
+.mq-dot{width:5px;height:5px;background:var(--accent);border-radius:50%;flex-shrink:0}
+
+/* ══ MAIN ══ */
+.main-wrap{padding-top:64px}
+
+/* ══ CATALOG ══ */
+#catalog-section{padding:80px 48px}
+.sec-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px}
+.sec-label{font-size:10px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
+.sec-title{font-family:'Bebas Neue';font-size:clamp(40px,5vw,72px);letter-spacing:3px;line-height:1}
+.sec-count{font-size:11px;color:var(--muted);letter-spacing:2px}
+
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2px}
+.product-card{cursor:pointer;position:relative;background:var(--dim);overflow:hidden;group:true}
+.product-card:nth-child(3n+1){grid-column:span 1}
+
+.img-holder{
+  aspect-ratio:3/4;overflow:hidden;position:relative;
+  background:#111;
+}
+.img-holder img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.4,0,.2,1),filter .5s}
+.product-card:hover .img-holder img{transform:scale(1.08);filter:brightness(.85)}
+
+.card-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(8,8,8,.9) 0%,rgba(8,8,8,0) 50%);
+  opacity:0;transition:opacity .4s;
+  display:flex;align-items:flex-end;padding:24px;
+}
+.product-card:hover .card-overlay{opacity:1}
+.card-cta{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Bebas Neue';font-size:14px;letter-spacing:3px;
+  color:var(--accent);
+  transform:translateY(10px);transition:transform .4s;
+}
+.product-card:hover .card-cta{transform:translateY(0)}
+.card-cta svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}
+
+.card-num{
+  position:absolute;top:16px;left:16px;
+  font-family:'Bebas Neue';font-size:11px;letter-spacing:2px;
+  color:var(--muted);border:1px solid rgba(255,255,255,.1);
+  padding:3px 10px;
+}
+.card-badge{
+  position:absolute;top:16px;right:16px;
+  background:var(--white);color:var(--black);
+  font-family:'Bebas Neue';font-size:11px;letter-spacing:2px;
+  padding:3px 12px;
+}
+.card-badge.new-badge{background:var(--accent);color:var(--black)}
+
+.card-info{padding:20px 20px 24px;border-top:1px solid var(--border)}
+.card-cat{font-size:9px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:6px}
+.card-name{font-family:'Barlow Condensed';font-size:20px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.card-price{font-family:'Bebas Neue';font-size:22px;letter-spacing:2px;color:var(--white)}
+
+/* ══ DETAILS ══ */
+#details-section{padding:80px 48px;display:none}
+.btn-back{
+  display:inline-flex;align-items:center;gap:10px;
+  background:transparent;border:1px solid var(--border);
+  color:var(--muted);padding:12px 24px;cursor:pointer;
+  font-family:'Tajawal';font-size:13px;letter-spacing:2px;
+  transition:all .3s;margin-bottom:60px;
+}
+.btn-back:hover{border-color:var(--accent);color:var(--accent)}
+.btn-back svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}
+
+.details-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+@media(max-width:900px){.details-grid{grid-template-columns:1fr}}
+
+.detail-img-wrap{position:relative}
+.detail-img-wrap::before{
+  content:'';position:absolute;top:20px;left:-20px;right:20px;bottom:-20px;
+  border:1px solid var(--border);z-index:0;pointer-events:none;
+}
+#detail-img{width:100%;display:block;position:relative;z-index:1;aspect-ratio:3/4;object-fit:cover}
+
+.detail-right{text-align:right}
+.detail-label{font-size:10px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;margin-bottom:16px}
+#detail-title{font-family:'Bebas Neue';font-size:clamp(36px,5vw,64px);letter-spacing:3px;line-height:1;margin-bottom:16px}
+#detail-price{font-family:'Bebas Neue';font-size:36px;color:var(--accent);letter-spacing:2px;margin-bottom:40px}
+
+.divider{width:100%;height:1px;background:var(--border);margin:32px 0}
+
+.order-box h3{font-family:'Bebas Neue';font-size:20px;letter-spacing:4px;margin-bottom:28px;color:var(--muted)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.field input,.field select{
+  width:100%;padding:14px 16px;
+  background:var(--dim);border:1px solid var(--border);
+  color:var(--white);font-family:'Tajawal';font-size:14px;
+  outline:none;transition:border-color .3s;
+  direction:rtl;
+}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field select option{background:var(--black)}
+.field input::placeholder{color:rgba(244,242,238,.3)}
+
+/* ══ DELIVERY OPTIONS ══ */
+.delivery-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.delivery-card{
+  border:1px solid var(--border);padding:16px 14px;cursor:pointer;
+  transition:all .3s;position:relative;text-align:center;background:transparent;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.delivery-card:hover{border-color:rgba(255,255,255,.3)}
+.delivery-card.selected{border-color:var(--white);background:rgba(255,255,255,.05)}
+.delivery-card.selected::after{content:'✓';position:absolute;top:8px;left:8px;width:18px;height:18px;border-radius:50%;background:var(--white);color:var(--black);font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;line-height:18px}
+.delivery-card svg{width:24px;height:24px;fill:none;stroke:var(--muted);stroke-width:1.5;transition:stroke .3s}
+.delivery-card.selected svg{stroke:var(--white)}
+.delivery-card-title{font-family:'Bebas Neue';font-size:14px;letter-spacing:2px;color:var(--muted);transition:color .3s}
+.delivery-card.selected .delivery-card-title{color:var(--white)}
+.delivery-card-price{font-family:'Bebas Neue';font-size:18px;letter-spacing:1px;color:var(--muted);transition:color .3s}
+.delivery-card.selected .delivery-card-price{color:var(--white)}
+.delivery-card-note{font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.2)}
+
+/* ORDER TOTAL SUMMARY */
+.order-summary{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 0;border-top:1px solid var(--border);margin-bottom:16px;
+}
+.order-summary-row{display:flex;flex-direction:column;gap:4px}
+.summary-line{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);letter-spacing:1px}
+.summary-line span:last-child{font-family:'Bebas Neue';font-size:14px;letter-spacing:1px}
+.summary-total{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.summary-total span:first-child{font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
+.summary-total span:last-child{font-family:'Bebas Neue';font-size:26px;letter-spacing:2px;color:var(--white)}
+
+.btn-order{
+  width:100%;padding:18px;margin-top:8px;
+  background:var(--white);color:var(--black);
+  border:none;cursor:pointer;
+  font-family:'Bebas Neue';font-size:18px;letter-spacing:5px;
+  position:relative;overflow:hidden;transition:all .3s;
+}
+.btn-order::before{content:'';position:absolute;inset:0;background:var(--accent);transform:translateX(101%);transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.btn-order span{position:relative;z-index:1}
+.btn-order:hover::before{transform:translateX(0)}
+.btn-order:hover{color:var(--black)}
+
+/* ══ TOAST ══ */
+#toasts{position:fixed;bottom:32px;left:32px;z-index:7000;display:flex;flex-direction:column;gap:10px}
+.toast{
+  display:flex;align-items:center;gap:14px;
+  background:var(--dim);border:1px solid var(--border);border-left:3px solid var(--accent);
+  padding:14px 20px;min-width:280px;
+  transform:translateX(-110%);opacity:0;transition:all .4s cubic-bezier(.4,0,.2,1);
+}
+.toast.in{transform:translateX(0);opacity:1}
+.toast svg{width:18px;height:18px;fill:none;stroke:var(--accent);stroke-width:2;flex-shrink:0}
+.toast span{font-size:13px;line-height:1.5}
+
+/* ══ CART DRAWER ══ */
+.drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:4000;opacity:0;pointer-events:none;transition:opacity .3s}
+.drawer-bg.open{opacity:1;pointer-events:all}
+.cart-drawer{
+  position:fixed;top:0;left:0;bottom:0;width:400px;z-index:4001;
+  background:#0e0e0e;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  transform:translateX(-100%);transition:transform .45s cubic-bezier(.4,0,.2,1);
+}
+.cart-drawer.open{transform:translateX(0)}
+.cd-head{padding:28px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.cd-head h3{font-family:'Bebas Neue';font-size:22px;letter-spacing:4px}
+.cd-x{width:36px;height:36px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:all .3s}
+.cd-x:hover{border-color:var(--accent);color:var(--accent)}
+.cd-x svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}
+.cd-body{flex:1;overflow-y:auto;padding:20px 28px}
+.cd-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted)}
+.cd-empty svg{width:52px;height:52px;fill:none;stroke:currentColor;stroke-width:1;opacity:.3}
+.cd-empty p{font-family:'Bebas Neue';font-size:20px;letter-spacing:3px}
+.cd-item{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--border)}
+.cd-thumb{width:72px;height:88px;flex-shrink:0;overflow:hidden}
+.cd-thumb img{width:100%;height:100%;object-fit:cover}
+.cd-info{flex:1}
+.cd-name{font-family:'Barlow Condensed';font-size:16px;font-weight:700;text-transform:uppercase;margin-bottom:4px}
+.cd-price{font-family:'Bebas Neue';font-size:18px;color:var(--accent);letter-spacing:1px}
+.cd-del{width:32px;height:32px;background:transparent;border:1px solid transparent;cursor:pointer;color:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;transition:all .3s}
+.cd-del svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5}
+.cd-del:hover{color:#ff5555;border-color:rgba(255,85,85,.3)}
+.cd-foot{padding:24px 28px;border-top:1px solid var(--border)}
+.cd-total{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.cd-total span:first-child{font-size:11px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
+.cd-total span:last-child{font-family:'Bebas Neue';font-size:26px;color:var(--accent);letter-spacing:2px}
+.btn-checkout{width:100%;padding:16px;background:var(--white);color:var(--black);border:none;cursor:pointer;font-family:'Bebas Neue';font-size:16px;letter-spacing:4px;transition:background .3s}
+.btn-checkout:hover{background:var(--accent)}
+
+/* ══ FOOTER ══ */
+footer{
+  background:var(--dim);border-top:1px solid var(--border);
+  padding:60px 48px 32px;
+}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:60px;margin-bottom:48px}
+.f-logo{font-family:'Bebas Neue';font-size:32px;letter-spacing:6px;display:block;margin-bottom:16px}
+.f-logo em{color:var(--accent);font-style:normal}
+.f-desc{font-size:13px;color:var(--muted);line-height:1.8;max-width:280px}
+.f-col h5{font-size:10px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;margin-bottom:20px}
+.f-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.f-col ul li a{font-size:13px;color:var(--muted);text-decoration:none;transition:color .3s;letter-spacing:1px}
+.f-col ul li a:hover{color:var(--white)}
+.footer-bottom{border-top:1px solid var(--border);padding-top:28px;display:flex;justify-content:space-between;align-items:center}
+.footer-bottom p{font-size:11px;color:rgba(244,242,238,.2);letter-spacing:2px}
+
+/* ══ MOBILE ══ */
+@media(max-width:768px){
+  header{padding:0 20px}
+  .header-nav{display:none}
+  #catalog-section,#details-section{padding:60px 20px}
+  .sec-header{flex-direction:column;align-items:flex-start;gap:12px}
+  .cart-drawer{width:100%}
+  .hero-content{padding:40px 24px}
+  .products-grid{grid-template-columns:1fr 1fr;gap:2px}
+  .footer-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-logo">TNG STORE</div>
+    <div class="loader-bar" id="lbar"></div>
+  </div>
+</div>
+
+<!-- CART DRAWER -->
+<div class="drawer-bg" id="dbg" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cDrawer">
+  <div class="cd-head">
+    <h3>CART</h3>
+    <button class="cd-x" onclick="closeCart()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="cd-body" id="cdBody">
+    <div class="cd-empty" id="cdEmpty">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <p>EMPTY</p>
+    </div>
+  </div>
+  <div class="cd-foot" id="cdFoot" style="display:none">
+    <div class="cd-total"><span>TOTAL</span><span id="cdTotal">0 DA</span></div>
+    <button class="btn-checkout" onclick="checkout()">CHECKOUT →</button>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div id="toasts"></div>
+
+<!-- HERO -->
+<div id="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-scanline"></div>
+  <div class="hero-content">
+    <div class="hero-tag">EST. 2026 · KHENCHELA · ALGERIA</div>
+    <h1 class="hero-title">
+      <span class="outline">STORE</span>
+    </h1>
+    <p class="hero-sub">STREETWEAR · OFFICIAL · SINCE 2026</p>
+    <div class="hero-actions">
+      <button class="btn-enter" onclick="enterSite()">
+        <span>انطلق الآن</span>
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header id="hdr">
+  <a class="logo" href="#"><em>TNG</em>.</a>
+  <nav class="header-nav">
+    <a href="#catalog-section">الكتالوج</a>
+    <a href="#">الكولكشن</a>
+    <a href="#">عن TNG</a>
+  </nav>
+  <div class="h-right">
+    <button class="h-btn" onclick="toast('قريباً — صفحة البحث 🔍','search')">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+    <button class="h-btn" onclick="toast('المفضلة قريباً ♡','heart')" >
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </button>
+    <button class="h-btn" onclick="openCart()" style="position:relative">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="cart-n" id="cartN">0</span>
+    </button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main-wrap" id="mainWrap" style="opacity:0">
+
+  <!-- MARQUEE -->
+  <div class="marquee">
+    <div class="mq-track">
+      <div class="mq-item"><span class="mq-dot"></span>NEW DROP 2026</div>
+      <div class="mq-item"><span class="mq-dot"></span>FREE DELIVERY +3000 DA</div>
+      <div class="mq-item"><span class="mq-dot"></span>KHENCHELA ORIGINAL</div>
+      <div class="mq-item"><span class="mq-dot"></span>LIMITED STOCK</div>
+      <div class="mq-item"><span class="mq-dot"></span>100% AUTHENTIC</div>
+      <div class="mq-item"><span class="mq-dot"></span>TNG STORE OFFICIAL</div>
+      <div class="mq-item"><span class="mq-dot"></span>NEW DROP 2026</div>
+      <div class="mq-item"><span class="mq-dot"></span>FREE DELIVERY +3000 DA</div>
+      <div class="mq-item"><span class="mq-dot"></span>KHENCHELA ORIGINAL</div>
+      <div class="mq-item"><span class="mq-dot"></span>LIMITED STOCK</div>
+      <div class="mq-item"><span class="mq-dot"></span>100% AUTHENTIC</div>
+      <div class="mq-item"><span class="mq-dot"></span>TNG STORE OFFICIAL</div>
+    </div>
+  </div>
+
+  <!-- CATALOG -->
+  <section id="catalog-section">
+    <div class="sec-header">
+      <div>
+        <div class="sec-label">DROP 001 · 2026</div>
+        <h2 class="sec-title">LATEST<br>COLLECTION</h2>
+      </div>
+      <div class="sec-count" id="prodCount">6 PIECES</div>
+    </div>
+    <div class="products-grid" id="products-grid"></div>
+  </section>
+
+  <!-- DETAILS -->
+  <section id="details-section">
+    <button class="btn-back" onclick="hideDetails()">
+      <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      العودة للكتالوج
+    </button>
+    <div class="details-grid">
+      <div class="detail-img-wrap">
+        <img id="detail-img" src="" alt="">
+      </div>
+      <div class="detail-right">
+        <div class="detail-label">TNG STORE · OFFICIAL</div>
+        <h2 id="detail-title"></h2>
+        <p id="detail-price"></p>
+        <div class="divider"></div>
+        <div class="order-box">
+          <h3>ORDER NOW</h3>
+          <div class="field">
+            <label>الاسم الكامل</label>
+            <input type="text" id="c-name" placeholder="أدخل اسمك الكامل">
+          </div>
+          <div class="field">
+            <label>رقم الهاتف</label>
+            <input type="tel" id="c-phone" placeholder="05XX XX XX XX">
+          </div>
+          <div class="field">
+            <label>الولاية</label>
+            <select id="c-wilaya">
+              <option disabled selected>اختر الولاية</option>
+              <option>01 — أدرار</option>
+              <option>02 — الشلف</option>
+              <option>03 — الأغواط</option>
+              <option>04 — أم البواقي</option>
+              <option>05 — باتنة</option>
+              <option>06 — بجاية</option>
+              <option>07 — بسكرة</option>
+              <option>08 — بشار</option>
+              <option>09 — البليدة</option>
+              <option>10 — البويرة</option>
+              <option>11 — تمنراست</option>
+              <option>12 — تبسة</option>
+              <option>13 — تلمسان</option>
+              <option>14 — تيارت</option>
+              <option>15 — تيزي وزو</option>
+              <option>16 — الجزائر</option>
+              <option>17 — الجلفة</option>
+              <option>18 — جيجل</option>
+              <option>19 — سطيف</option>
+              <option>20 — سعيدة</option>
+              <option>21 — سكيكدة</option>
+              <option>22 — سيدي بلعباس</option>
+              <option>23 — عنابة</option>
+              <option>24 — قالمة</option>
+              <option>25 — قسنطينة</option>
+              <option>26 — المدية</option>
+              <option>27 — مستغانم</option>
+              <option>28 — المسيلة</option>
+              <option>29 — معسكر</option>
+              <option>30 — ورقلة</option>
+              <option>31 — وهران</option>
+              <option>32 — البيض</option>
+              <option>33 — إليزي</option>
+              <option>34 — برج بوعريريج</option>
+              <option>35 — بومرداس</option>
+              <option>36 — الطارف</option>
+              <option>37 — تندوف</option>
+              <option>38 — تيسمسيلت</option>
+              <option>39 — الوادي</option>
+              <option>40 — خنشلة</option>
+              <option>41 — سوق أهراس</option>
+              <option>42 — تيبازة</option>
+              <option>43 — ميلة</option>
+              <option>44 — عين الدفلى</option>
+              <option>45 — النعامة</option>
+              <option>46 — عين تيموشنت</option>
+              <option>47 — غرداية</option>
+              <option>48 — غليزان</option>
+              <option>49 — تيميمون</option>
+              <option>50 — برج باجي مختار</option>
+              <option>51 — أولاد جلال</option>
+              <option>52 — بني عباس</option>
+              <option>53 — عين صالح</option>
+              <option>54 — عين قزام</option>
+              <option>55 — تقرت</option>
+              <option>56 — جانت</option>
+              <option>57 — المغير</option>
+              <option>58 — المنيعة</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>البلدية</label>
+            <input type="text" id="c-commune" placeholder="أدخل اسم بلديتك">
+          </div>
+          <div class="field">
+            <label>طريقة التوصيل</label>
+            <div class="delivery-options">
+              <div class="delivery-card selected" id="d-office" onclick="selectDelivery('office')">
+                <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+                <div class="delivery-card-title">توصيل للمكتب</div>
+                <div class="delivery-card-price">500 DA</div>
+                <div class="delivery-card-note">أقرب مكتب منك</div>
+              </div>
+              <div class="delivery-card" id="d-home" onclick="selectDelivery('home')">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <div class="delivery-card-title">توصيل للمنزل</div>
+                <div class="delivery-card-price">750 DA</div>
+                <div class="delivery-card-note">مباشرة لبابك</div>
+              </div>
+            </div>
+          </div>
+          <div class="summary-total" id="orderSummary">
+            <span>المجموع الكلي</span>
+            <span id="orderGrandTotal">— DA</span>
+          </div>
+          <button class="btn-order" onclick="sendOrder()"><span>تأكيد الطلب ←</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <span class="f-logo"><em>TNG</em>.</span>
+        <p class="f-desc">ماركة خنشلة الأصيلة للستريتوير. كل قطعة قصة، كل تصميم هوية. منذ 2026.</p>
+      </div>
+      <div class="f-col">
+        <h5>NAVIGATION</h5>
+        <ul>
+          <li><a href="#catalog-section">الكتالوج</a></li>
+          <li><a href="#">الكولكشن الجديد</a></li>
+          <li><a href="#">قصتنا</a></li>
+          <li><a href="#">تواصل معنا</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h5>INFO</h5>
+        <ul>
+          <li><a href="#">📍 خنشلة، الجزائر</a></li>
+          <li><a href="#">سياسة الإرجاع</a></li>
+          <li><a href="#">الشحن والتوصيل</a></li>
+          <li><a href="#">الأسئلة الشائعة</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 TNG STORE — ALL RIGHTS RESERVED</p>
+      <p style="font-size:10px;color:rgba(244,242,238,.1);letter-spacing:4px">KHENCHELA MADE</p>
+    </div>
+  </footer>
+</main>
+
+<script>
+// ── PRODUCTS — synced with admin panel via localStorage ──
+const _default = [
+  { id:1, name:"Universal Money Hoodie", price:"3500 DA", img:"https://i.postimg.cc/mggL0Vp0/IMG_20260210_224350_951.jpg", cat:"HOODIE", badge:"NEW" },
+  { id:2, name:"Vast Shadow Set",        price:"3800 DA", img:"https://i.postimg.cc/KYryjMWw/IMG_20260210_225601_843.jpg", cat:"SET",    badge:"" },
+  { id:3, name:"Street Ghost Tee",       price:"2200 DA", img:"https://i.postimg.cc/T1t1BSG8/IMG_20260210_222155_392.jpg", cat:"TEE",    badge:"HOT" },
+  { id:4, name:"Tactical Cargo Black",   price:"2800 DA", img:"https://i.postimg.cc/Gpp4xb1h/IMG_20260210_223009_331.jpg", cat:"CARGO",  badge:"" },
+  { id:5, name:"Urban Gray Ensemble",    price:"3900 DA", img:"https://i.postimg.cc/PqzkJw70/IMG_20260210_225603_585.jpg", cat:"SET",    badge:"NEW" },
+  { id:6, name:"Classic Hoodie Gray",    price:"2600 DA", img:"https://i.postimg.cc/L889rvQc/IMG_20260210_224341_709.jpg", cat:"HOODIE", badge:"" },
+];
+let products = (() => { try { const s=localStorage.getItem('tng_products'); return s?JSON.parse(s):[..._default]; } catch{return[..._default];} })();
+
+let cart = [];
+
+// ── RENDER ────────────────────────────────────────────
+function renderProducts() {
+  const grid = document.getElementById('products-grid');
+  grid.innerHTML = products.map((p, i) => `
+    <div class="product-card" onclick="viewProduct(${p.id})" style="animation:fadeUp .5s ${i*.07}s both">
+      <div class="img-holder">
+        <img src="${p.img}" alt="${p.name}" loading="lazy">
+        <div class="card-overlay">
+          <div class="card-cta">
+            عرض المنتج
+            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+        </div>
+        <div class="card-num">0${i+1}</div>
+        ${p.badge ? `<div class="card-badge new-badge">${p.badge}</div>` : ''}
+      </div>
+      <div class="card-info">
+        <div class="card-cat">${p.cat}</div>
+        <div class="card-name">${p.name}</div>
+        <div class="card-price">${p.price}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── HERO ENTER ────────────────────────────────────────
+function enterSite() {
+  const hero = document.getElementById('hero');
+  hero.style.transition = '1s cubic-bezier(0.8,0,0.2,1)';
+  hero.style.transform = 'translateY(-100%)';
+  hero.style.opacity = '0';
+  setTimeout(() => {
+    hero.style.display = 'none';
+    document.getElementById('hdr').classList.add('visible');
+    const main = document.getElementById('mainWrap');
+    main.style.opacity = '1';
+    main.style.transition = 'opacity .5s';
+  }, 900);
+}
+
+// ── VIEW PRODUCT ──────────────────────────────────────
+function viewProduct(id) {
+  const p = products.find(x => x.id === id);
+  document.getElementById('detail-title').textContent = p.name;
+  document.getElementById('detail-price').textContent = p.price;
+  document.getElementById('detail-img').src = p.img;
+  document.getElementById('catalog-section').style.display = 'none';
+  document.getElementById('details-section').style.display = 'block';
+
+  // store current product
+  document.getElementById('details-section').dataset.pid = id;
+  selectDelivery('office');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function hideDetails() {
+  document.getElementById('catalog-section').style.display = 'block';
+  document.getElementById('details-section').style.display = 'none';
+}
+
+// ── DELIVERY ──────────────────────────────────────────
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzxn0aA03DzrwfIWxdExiaKKpklMU4a31MFGhsMXeCbI39syqEYJlLUMUzP9v3Iv3Jq/exec';
+let deliveryType = 'office'; // 'office' | 'home'
+const DELIVERY_FEES = { office: 500, home: 750 };
+
+function selectDelivery(type) {
+  deliveryType = type;
+  document.getElementById('d-office').classList.toggle('selected', type === 'office');
+  document.getElementById('d-home').classList.toggle('selected', type === 'home');
+  updateGrandTotal();
+}
+
+function updateGrandTotal() {
+  const pid = parseInt(document.getElementById('details-section').dataset.pid || '0');
+  const p = products.find(x => x.id === pid);
+  if (!p) return;
+  const productPrice = parseInt(p.price.replace(/\D/g, ''));
+  const delivery = DELIVERY_FEES[deliveryType];
+  const total = productPrice + delivery;
+  document.getElementById('orderGrandTotal').textContent =
+    total.toLocaleString('ar') + ' DA';
+}
+
+// ── ORDER → GOOGLE SHEETS ─────────────────────────────
+async function sendOrder() {
+  const name    = document.getElementById('c-name').value.trim();
+  const phone   = document.getElementById('c-phone').value.trim();
+  const wilaya  = document.getElementById('c-wilaya').value;
+  const commune = document.getElementById('c-commune').value.trim();
+
+  if (!name)    { toast('أدخل اسمك الكامل', 'warn'); return; }
+  if (!phone)   { toast('أدخل رقم هاتفك', 'warn');   return; }
+  if (wilaya === 'اختر الولاية') { toast('اختر الولاية', 'warn'); return; }
+  if (!commune) { toast('أدخل اسم بلديتك', 'warn');  return; }
+
+  const pid = parseInt(document.getElementById('details-section').dataset.pid);
+  const p   = products.find(x => x.id === pid);
+  const productPrice = parseInt(p.price.replace(/\D/g, ''));
+  const deliveryFee  = DELIVERY_FEES[deliveryType];
+  const total        = productPrice + deliveryFee;
+  const deliveryLabel = deliveryType === 'office' ? 'توصيل للمكتب' : 'توصيل للمنزل';
+
+  // Disable button + show loading
+  const btn = document.querySelector('.btn-order');
+  btn.disabled = true;
+  btn.querySelector('span').textContent = '⏳  جاري الإرسال...';
+
+  const payload = {
+    name,
+    phone,
+    wilaya,
+    commune,
+    product:     p.name,
+    productPrice: p.price,
+    delivery:    deliveryLabel,
+    deliveryFee: deliveryFee + ' DA',
+    total:       total + ' DA',
+    date: new Date().toLocaleString('ar-DZ', { timeZone: 'Africa/Algiers' }),
+  };
+
+  try {
+    await fetch(SHEET_URL, {
+      method:  'POST',
+      mode:    'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+
+    // Success
+    toast(`✅  تم إرسال طلبك بنجاح! سنتواصل معك قريباً`, 'check');
+    cart.push({ ...p, qty: 1 });
+    updateCart();
+
+    // Reset form
+    document.getElementById('c-name').value    = '';
+    document.getElementById('c-phone').value   = '';
+    document.getElementById('c-commune').value = '';
+    document.getElementById('c-wilaya').selectedIndex = 0;
+    selectDelivery('office');
+
+  } catch (err) {
+    toast('حدث خطأ، حاول مجدداً', 'warn');
+  } finally {
+    btn.disabled = false;
+    btn.querySelector('span').textContent = 'تأكيد الطلب ←';
+  }
+}
+
+// ── CART ─────────────────────────────────────────────
+function updateCart() {
+  const count = cart.reduce((s,x)=>s+x.qty,0);
+  document.getElementById('cartN').textContent = count;
+  const body  = document.getElementById('cdBody');
+  const foot  = document.getElementById('cdFoot');
+  const empty = document.getElementById('cdEmpty');
+  if (!cart.length) {
+    body.innerHTML = ''; body.appendChild(empty);
+    empty.style.display='flex'; foot.style.display='none';
+  } else {
+    empty.style.display='none'; foot.style.display='block';
+    const total = cart.reduce((s,x)=>s+parseInt(x.price)*x.qty,0);
+    body.innerHTML = cart.map(item=>`
+      <div class="cd-item">
+        <div class="cd-thumb"><img src="${item.img}" alt="${item.name}"></div>
+        <div class="cd-info">
+          <div class="cd-name">${item.name}</div>
+          <div class="cd-price">${item.price}</div>
+        </div>
+        <button class="cd-del" onclick="removeFromCart(${item.id})">
+          <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+      </div>
+    `).join('');
+    document.getElementById('cdTotal').textContent = total + ' DA';
+  }
+}
+function removeFromCart(id) { cart=cart.filter(x=>x.id!==id); updateCart(); }
+function openCart()  { document.getElementById('cDrawer').classList.add('open'); document.getElementById('dbg').classList.add('open'); }
+function closeCart() { document.getElementById('cDrawer').classList.remove('open'); document.getElementById('dbg').classList.remove('open'); }
+function checkout()  { toast('🎉  تم تأكيد طلبك! سنتواصل قريباً','check'); cart=[]; updateCart(); closeCart(); }
+
+// ── TOAST ─────────────────────────────────────────────
+const icons = {
+  check: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+  warn:  '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  search:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+  heart: '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+};
+function toast(msg, type='check') {
+  const stack = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `${icons[type]||icons.check}<span>${msg}</span>`;
+  stack.appendChild(el);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('in')));
+  setTimeout(()=>{ el.classList.remove('in'); setTimeout(()=>el.remove(),400); }, 3200);
+}
+
+// ── CURSOR ────────────────────────────────────────────
+const cur=document.getElementById('cur'), cur2=document.getElementById('cur2');
+document.addEventListener('mousemove', e => {
+  cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px';
+  setTimeout(()=>{ cur2.style.left=e.clientX+'px'; cur2.style.top=e.clientY+'px'; }, 50);
+});
+
+// ── HEADER ON SCROLL ──────────────────────────────────
+window.addEventListener('scroll', () => {
+  if (document.getElementById('hero').style.display === 'none') {
+    document.getElementById('hdr').classList.add('visible');
+  }
+});
+
+// ── INIT ─────────────────────────────────────────────
+renderProducts();
+
+// Loader
+window.addEventListener('load', () => {
+  const bar = document.getElementById('lbar');
+  bar.classList.add('go');
+  setTimeout(() => document.getElementById('loader').classList.add('done'), 1100);
+});
+</script>
+</body>
+</html>
